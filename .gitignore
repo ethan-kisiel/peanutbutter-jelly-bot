@@ -1,0 +1,5 @@
+.*
+!/.gitignore
+venv/
+__pycache__/
+environment_vars.py
