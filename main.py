@@ -9,7 +9,7 @@ check_for = ["peanutbutterandjelly",
              "pb&j",
              "peanutbutterjellytime"]
 
-link = "[It's peanut butter jelly time!](https://www.youtube.com/watch?v=OOIJxKopZFQ)"
+link = "[It's peanut butter jelly time!](https://www.youtube.com/watch?v=eRBOgtp0Hac)"
 
 def main():
     reddit = praw.Reddit(client_id=env.get("CLIENT_ID"),
@@ -19,12 +19,15 @@ def main():
                          password=env.get("PASSWORD"))
 
     subreddit = reddit.subreddit("all")
-    for submission in subreddit.hot(limit=1):
-        for comment in submission.comments:
+
+    for submission in subreddit.hot(limit=10):
+        comments = submission.comments
+        comments.replace_more(limit=None)
+        for comment in comments:
             if hasattr(comment, "body"):
                 condensed_lower = comment.body.lower().replace(' ', '')
                 for check in check_for:
-                    if condensed_lower.contains(check):
+                    if check in condensed_lower:
                         # respond with the text
                         comment.reply(link)
                         sleep(660)
