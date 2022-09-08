@@ -9,7 +9,7 @@ class Bot:
     functionality of the bot
     """
 
-    check_for = ["peanutbutterandjelly",
+    CHECK_FOR = ["peanutbutterandjelly",
                 "peanutbutter&jelly",
                 "pbandj",
                 "pb&j",
@@ -18,6 +18,8 @@ class Bot:
     MESSAGE = "It's peanut butter jelly time!"
     LINK = "https://www.youtube.com/watch?v=BNIVUByuylE&autoplay=1"
     LINK_MESSAGE = f"[{MESSAGE}]({LINK})"
+    FOOTER = "If this message recieves negative upvotes it will be removed."
+    FINAL_MESSAGE = f"{LINK_MESSAGE}\n\n{FOOTER}"
 
     def __init__(self) -> None:
         """
@@ -42,26 +44,29 @@ class Bot:
 
         return parent_ids
 
-    def perform_scan(self, subreddit: str) -> int:
+    def perform_scan(self, subreddit_name: str) -> int:
         """
         Scans for reddit comments
         """
 
         try:
-            subreddit = reddit.subreddit(subreddit)
-                for submission in subreddit.hot(limit=10):
-                    comments = submission.comments
-                    comments.replace_more(limit=None)
-                    for comment in comments:
-                        if hasattr(comment, "body"):
-                            condensed_lower = comment.body.lower()
-                            condensed_lower.replace(' ', '')
-                            for check in check_for:
-                                if check in condensed_lower:
-                                    #comment.reply(link)
-                                    if !make_reply(comment):
-                                        sleep(660)
-                                        break
+            subreddit = self.reddit.subreddit(subreddit_name)
+            for submission in subreddit.hot(limit=10):
+                print(submission.title)
+                comments = submission.comments
+                comments.replace_more(limit=None)
+                for comment in comments:
+                    if hasattr(comment, "body"):
+                        print(comment.score)
+                        condensed_lower = comment.body.lower()
+                        condensed_lower = condensed_lower.replace(' ', '')
+                        print(condensed_lower)
+                        for check in Bot.CHECK_FOR:
+                            if check in condensed_lower:
+                                reply_result = self.make_reply(comment)
+                                if not reply_result:
+                                    sleep(660)
+                                    break
         except:
             return 1
         return 0
@@ -75,9 +80,8 @@ class Bot:
         comment_id = comment.id
         # adds the comment id of the comment we are responding to
         if comment_id not in self.parent_ids:
-            comment.reply()
+            comment.reply(Bot.FINAL_MESSAGE)
             self.parent_ids.add(comment_id)
-
         else:
             return 1
         return 0
@@ -86,11 +90,14 @@ class Bot:
     def drain_bad_replies(self):
         """
         Runs through all bot comments
-        if a comment has more than x
-        percent downvote rate that comment
-        is deleted
+        if a comment has less than x
+        upvotes, it will be deleted.
         """
-        for comment in self.comments.new(limit=0):
-            if comment.score < -2:
+        for comment in self.redditor.comments.new(limit=None):
+            if comment.score < 1:
                 comment.delete()
+                self.parent_ids = self.initialize_comment_parents()
         return
+
+    def get_parent_ids(self):
+        return self.parent_ids
