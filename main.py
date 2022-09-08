@@ -2,7 +2,9 @@ import praw
 import environment_vars
 from time import sleep
 from os import environ as env
+from pbj_bot import bot
 
+"""
 check_for = ["peanutbutterandjelly",
              "peanutbutter&jelly",
              "pbandj",
@@ -10,8 +12,13 @@ check_for = ["peanutbutterandjelly",
              "peanutbutterjellytime"]
 
 link = "[It's peanut butter jelly time!](https://www.youtube.com/watch?v=eRBOgtp0Hac)"
-
+"""
 def main():
+    test_bot = bot.Bot()
+    print(bot.Bot.LINK_MESSAGE)
+    for s_id in test_bot.parent_ids:
+        print(s_id)
+    """
     reddit = praw.Reddit(client_id=env.get("CLIENT_ID"),
                          client_secret=env.get("CLIENT_SECRET"),
                          user_agent=env.get("USER_AGENT"),
@@ -32,6 +39,8 @@ def main():
                         comment.reply(link)
                         sleep(660)
                         break
+                    """
+
     return
 
 if __name__ == "__main__":

@@ -2,5 +2,6 @@
 !/.gitignore
 venv/
 __pycache__/
-ppj_bot/__pycache__/
+src/ppj_bot/__pycache__/
 environment_vars.py
+test.py
