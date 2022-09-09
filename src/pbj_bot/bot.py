@@ -36,6 +36,9 @@ class Bot:
         self.redditor = self.reddit.user.me()
         self.parent_ids = self.initialize_comment_parents()
 
+    def __repr__(self):
+        return self.redditor.name
+
     def initialize_comment_parents(self) -> set[str]:
         parent_ids = set()
         for comment in self.redditor.comments.new(limit=None):
@@ -44,29 +47,23 @@ class Bot:
 
         return parent_ids
 
-    def perform_scan(self, subreddit_name: str) -> int:
+    def perform_scan(self, subreddit_name: str, limit: int) -> int:
         """
-        Scans for reddit comments
+        Scans top level comments limit number of posts in subreddit_name
         """
 
         try:
             subreddit = self.reddit.subreddit(subreddit_name)
-            for submission in subreddit.hot(limit=10):
-                print(submission.title)
+            for submission in subreddit.hot(limit=limit):
                 comments = submission.comments
                 comments.replace_more(limit=None)
                 for comment in comments:
                     if hasattr(comment, "body"):
-                        print(comment.score)
-                        condensed_lower = comment.body.lower()
-                        condensed_lower = condensed_lower.replace(' ', '')
-                        print(condensed_lower)
-                        for check in Bot.CHECK_FOR:
-                            if check in condensed_lower:
-                                reply_result = self.make_reply(comment)
-                                if not reply_result:
-                                    sleep(660)
-                                    break
+                        if Bot.check_comment(comment):
+                            reply_result = self.make_reply(comment)
+                            if not reply_result:
+                                sleep(660)
+                                break
         except:
             return 1
         return 0
@@ -101,3 +98,17 @@ class Bot:
 
     def get_parent_ids(self):
         return self.parent_ids
+
+    def check_comment(comment) -> bool:
+        """
+        Iterates through CHECK_FOR
+        if an element is contained,
+        returns true
+        """
+        condensed_lower = comment.body.lower()
+        condensed_lower = condensed_lower.replace(' ', '')
+        for check in Bot.CHECK_FOR:
+            if check in condensed_lower:
+                return True
+            return False
+
