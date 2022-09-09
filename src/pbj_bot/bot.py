@@ -39,6 +39,9 @@ class Bot:
     def __repr__(self):
         return self.redditor.name
 
+    def __bool__(self):
+        return True if self.redditor else False
+
     def initialize_comment_parents(self) -> set[str]:
         parent_ids = set()
         for comment in self.redditor.comments.new(limit=None):
