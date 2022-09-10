@@ -65,6 +65,7 @@ class Bot:
                         if Bot.check_comment(comment):
                             reply_result = self.make_reply(comment)
                             if not reply_result:
+                                print("sent reply")
                                 sleep(660)
                                 break
         except:
