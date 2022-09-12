@@ -69,6 +69,7 @@ class Bot:
                                 sleep(660)
                                 break
         except:
+            print("caught exception")
             return 1
         return 0
 
@@ -114,5 +115,5 @@ class Bot:
         for check in Bot.CHECK_FOR:
             if check in condensed_lower:
                 return True
-            return False
+        return False
 
